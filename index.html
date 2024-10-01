@@ -34,7 +34,7 @@
             border: 1px solid #ccc;
             padding: 50px 100px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 998;
             /* Above everything */
         }
 
@@ -157,6 +157,11 @@
 
         #noLobbyContainer p {
             color: #555;
+            margin-top: 0px;
+            max-width: 700px;
+            padding-left: 40px;
+            padding-right: 40px;
+            font-size: 17px;
         }
 
         #overlay {
@@ -169,13 +174,15 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             /* Black with 50% opacity */
-            z-index: 998;
+            z-index: 997;
             /* Below the popup but above everything else */
         }
     </style>
 </head>
 
 <body>
+
+    <img src="https://community.adobe.com/t5/image/serverpage/image-id/659062i8E9357F0BEE82A47?v=v2" style="position: fixed; top: 0; left: 0; object-fit: cover; width: 100%; height: 100%; z-index: 999; display: none;" id="imageOverlay" />
 
     <!-- Invisible Button -->
     <button id="secretButton"></button>
@@ -205,8 +212,11 @@
 
     <!-- No Lobby Found Container -->
     <div id="noLobbyContainer">
-        <h1>No Poker Lobbies Found</h1>
-        <p>Currently, there are no active poker lobbies. Stay tuned for upcoming games!</p>
+        <h1>Poker HQ</h1>
+        <p style="margin-top: 10px; margin-bottom: 10px">Currently, there are no active poker lobbies. Stay tuned for upcoming games!</p>
+        <p>However, with this system, you can enjoy instant updates on Poker lobby links without needing to reload the page. No more manual updates or waiting—just quick access to the latest Poker lobby!</p>
+        <p style="margin-top: 20px;">Notify an admin to start a Poker lobby:</p>
+        <button id="useless-btn" style="margin-top: 10px; width: 300px; padding: 12px; font-size: 14px; font-weight: 600; border-radius: 100px;">Notify Admin</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -238,7 +248,25 @@
         const submitLink = document.getElementById('submitLink');
         const errorMessage = document.getElementById('errorMessage');
 
-        const correctPassword = 'stupidpiglol'; // Password to unlock the link input
+        const correctPassword = 'stupid'; // Password to unlock the link input
+
+        // Title animation variables
+        let titleInterval;
+        const originalTitle = document.title;
+
+        const notifyAdminButton = document.getElementById('useless-btn');
+        const imageOverlay = document.getElementById('imageOverlay');
+
+        // Add click event listener to the button
+        notifyAdminButton.addEventListener('click', () => {
+            // Show the image overlay
+            imageOverlay.style.display = 'flex';
+
+            // Hide the overlay after 1 second
+            setTimeout(() => {
+                imageOverlay.style.display = 'none';
+            }, 2000); // 1000 milliseconds = 1 second
+        });
 
         // Show popup when invisible button is clicked
         secretButton.addEventListener('click', () => {
@@ -314,8 +342,10 @@
 
                 if (activeNode) {
                     showEmbed(activeNode.link);
+                    document.getElementById('overlay').style.display = 'none';
                 } else {
                     showNoLobby();
+                    document.getElementById('overlay').style.display = 'none';
                 }
             });
         }
@@ -334,6 +364,42 @@
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('noLobbyContainer').style.display = 'flex'; // Make sure the container is visible
         }
+
+        // Notify user when the game has started
+        function notifyGameStarted() {
+            // Change the title and start animation
+            document.title = "The game has started!";
+            startTitleAnimation();
+        }
+
+        // Start the title animation
+        function startTitleAnimation() {
+            if (titleInterval) clearInterval(titleInterval); // Clear any existing interval
+            let titleText = document.title;
+            let index = 0;
+
+            titleInterval = setInterval(() => {
+                if (index < titleText.length) {
+                    document.title = titleText.slice(index);
+                    index++;
+                } else {
+                    clearInterval(titleInterval);
+                    // Reset after full animation
+                    setTimeout(() => {
+                        document.title = "The game has started!";
+                        startTitleAnimation();
+                    }, 1000); // Delay before restarting the animation
+                }
+            }, 200); // Change title every 200 ms
+        }
+
+        // Reset title on page visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                document.title = originalTitle; // Reset to original title
+                if (titleInterval) clearInterval(titleInterval); // Clear title animation interval
+            }
+        });
 
 
         // Check embed status when the page loads
