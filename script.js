@@ -6,16 +6,11 @@ const firebaseConfig = {
     storageBucket: "poker-hq.appspot.com",
     messagingSenderId: "968470349230",
     appId: "1:968470349230:web:15f3c021ce9a6bdd10b43f"
-};
+}; 
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-
-// Variables for key sequence detection
-let keySequence = [];
-const secretKey = ["1", "2", "3", "0", "9", "8"]; // The exact key sequence
-const maxSequenceLength = secretKey.length; // Max length of the sequence
 
 // DOM elements
 const container = document.getElementById('container');
@@ -24,6 +19,10 @@ const embedFrame = document.getElementById('embedFrame');
 const popup = document.getElementById('popup');
 const embedInput = document.getElementById('embedInput');
 const submitLink = document.getElementById('submitLink');
+
+// Keys required to open the popup
+const requiredKeys = ['1', '2', '3', 'j', 'k'];
+let pressedKeys = new Set();
 
 // Function to check the current display status in Firebase
 function checkEmbedStatus() {
@@ -76,20 +75,20 @@ function showNoLobby() {
     container.style.display = 'block';
 }
 
-// Detect the exact secret key sequence
+// Detect simultaneous key presses
 window.addEventListener('keydown', (e) => {
-    keySequence.push(e.key);  // Add the pressed key to the sequence
+    pressedKeys.add(e.key); // Add key to the set
 
-    // If the sequence becomes longer than the secret key, remove the oldest key
-    if (keySequence.length > maxSequenceLength) {
-        keySequence.shift();
+    // Check if all required keys are pressed
+    if (requiredKeys.every(key => pressedKeys.has(key))) {
+        showPopup(); // Show the popup
+        pressedKeys.clear(); // Clear pressed keys after popup is shown
     }
+});
 
-    // Check if the current keySequence matches the secretKey exactly
-    if (keySequence.join('') === secretKey.join('')) {
-        showPopup();  // Show the popup when the exact sequence is entered
-        keySequence = [];  // Reset the sequence
-    }
+// Detect when keys are released to remove them from the set
+window.addEventListener('keyup', (e) => {
+    pressedKeys.delete(e.key); // Remove key from the set
 });
 
 // Show the popup for inputting embed link
