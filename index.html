@@ -324,12 +324,14 @@
         function showEmbed(link) {
             document.getElementById('embedContainer').style.display = 'block';
             document.getElementById('noLobbyContainer').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
             document.getElementById('embedFrame').src = link;
         }
 
         // Show message when no lobby is found
         function showNoLobby() {
             document.getElementById('embedContainer').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
             document.getElementById('noLobbyContainer').style.display = 'flex'; // Make sure the container is visible
         }
 
