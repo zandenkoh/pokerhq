@@ -9,13 +9,14 @@
         /* Invisible button */
         #secretButton {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 50px;
-            height: 50px;
+            top: 0px;
+            left: 0px;
+            width: 10px;
+            height: 10px;
             background: transparent;
             border: none;
-            cursor: pointer;
+            cursor: default;
+            z-index: 100; /* Keep it on top of everything */
         }
 
         /* Popup Styling */
@@ -27,8 +28,57 @@
             transform: translate(-50%, -50%);
             background: #fff;
             border: 1px solid #ccc;
-            padding: 20px;
+            padding: 50px 100px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 999; /* Above everything */
+        }
+        
+        :root {
+            --twitter-blue: #1DA1F2; /* Twitter brand colour */
+        }
+
+       #popup {
+          /* Existing styles remain, just add background color */
+            background: #ffffff; /* White background for the popup */
+            border-radius: 15px; /* Rounded corners for the popup */
+        }
+
+        button {
+            background-color: var(--twitter-blue); /* Twitter button color */
+          color: white; /* Text colour */
+          border: none; /* No border */
+          border-radius: 100px; /* Rounded corners */
+          width: 100%;
+          font-size: 15px;
+          font-weight: 600;
+          padding: 14px 20px; /* Padding for better button size */
+          cursor: pointer; /* Pointer cursor on hover */
+        }
+
+        /* Add hover effect for buttons */
+        button:hover {
+           background-color: #1A91DA; /* Darker blue on hover */
+        }
+
+        /* Optional: Style the inputs for a consistent look */
+        input[type="password"], input[type="text"] {
+           border: 1px solid #ccc; /* Light grey border */
+          border-radius: 5px; /* Slightly rounded corners */
+         padding: 14px 18px; /* Padding for input fields */
+         width: calc(100% - 36px); /* Full width minus padding */
+           margin-bottom: 30px;
+        }
+        
+        input[type="password"]:focus, input[type="text"]:focus {
+            border: 1px solid #aaa; /* Light grey border */
+            outline: none;
+        }
+
+        /* Optional: Style for error message */
+        #errorMessage {
+           color: red;
+          display: none;
+          margin-top: 10px; /* Space above error message */
         }
 
         /* Hidden initially */
@@ -40,19 +90,74 @@
             color: red;
             display: none;
         }
+
+        /* Full page embed */
+        #embedContainer {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #embedFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Full page container for no lobby found */
+        #noLobbyContainer {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f7f7f7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #noLobbyContainer h1 {
+            
+        }
+
+        #noLobbyContainer p {
+            color: #555;
+        }
+        
+        #overlay {
+          display: none; /* Initially hidden */
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+          z-index: 998; /* Below the popup but above everything else */
+        }
+
     </style>
 </head>
 <body>
 
     <!-- Invisible Button -->
     <button id="secretButton"></button>
+    
+    <div id="overlay"></div>
 
     <!-- Popup for Password and Link Input -->
     <div id="popup">
         <div id="passwordInputDiv">
             <p>Enter Password:</p>
             <input type="password" id="passwordInput" placeholder="Password">
-            <button id="passwordSubmit">Submit</button>
+            <button id="passwordSubmit">Enter</button>
             <p id="errorMessage">Incorrect password. Please try again.</p>
         </div>
 
@@ -63,8 +168,15 @@
         </div>
     </div>
 
+    <!-- Embed Container -->
     <div id="embedContainer">
-        <iframe id="embedFrame" width="600" height="400"></iframe>
+        <iframe id="embedFrame"></iframe>
+    </div>
+
+    <!-- No Lobby Found Container -->
+    <div id="noLobbyContainer">
+        <h1>No Poker Lobbies Found</h1>
+        <p>Currently, there are no active poker lobbies. Stay tuned for upcoming games!</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -101,6 +213,12 @@
         // Show popup when invisible button is clicked
         secretButton.addEventListener('click', () => {
             popup.style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        });
+        
+        document.getElementById('overlay').addEventListener('click', () => {
+            popup.style.display = 'none';
+            document.getElementById('overlay').style.display = 'none'; // Hide overlay
         });
 
         // Password validation logic
@@ -169,16 +287,20 @@
                 }
             });
         }
-
+        
         // Show the embed iframe
         function showEmbed(link) {
-            document.getElementById('embedFrame').src = link;
+            document.getElementById('embedContainer').style.display = 'block';
+           document.getElementById('noLobbyContainer').style.display = 'none';
+          document.getElementById('embedFrame').src = link;
         }
 
         // Show message when no lobby is found
         function showNoLobby() {
-            document.getElementById('embedFrame').src = '';
+           document.getElementById('embedContainer').style.display = 'none';
+           document.getElementById('noLobbyContainer').style.display = 'flex'; // Make sure the container is visible
         }
+
 
         // Check embed status when the page loads
         checkEmbedStatus();
