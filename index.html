@@ -3,43 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker HQ</title>
     <link rel="icon" type="image/png" href="https://zandenkoh.codeberg.page/Radium/assets/Neutron-2.png">
-    <link rel="stylesheet" href="style.css">
+    <title>Poker HQ</title>
+    <style>
+        /* Invisible button */
+        #secretButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Popup Styling */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Hidden initially */
+        #linkInputDiv {
+            display: none;
+        }
+
+        #errorMessage {
+            color: red;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="container">
-        <h1>No Poker Lobbies Found</h1>
-        <p>Currently, there are no active poker lobbies. Stay tuned for upcoming games!</p>
+
+    <!-- Invisible Button -->
+    <button id="secretButton"></button>
+
+    <!-- Popup for Password and Link Input -->
+    <div id="popup">
+        <div id="passwordInputDiv">
+            <p>Enter Password:</p>
+            <input type="password" id="passwordInput" placeholder="Password">
+            <button id="passwordSubmit">Submit</button>
+            <p id="errorMessage">Incorrect password. Please try again.</p>
+        </div>
+
+        <div id="linkInputDiv">
+            <p>Enter Embed Link:</p>
+            <input type="text" id="embedInput" placeholder="Embed Link">
+            <button id="submitLink">Submit Link</button>
+        </div>
     </div>
 
-    <div id="embedContainer" style="display: none;">
-        <iframe id="embedFrame" src="" frameborder="0"></iframe>
+    <div id="embedContainer">
+        <iframe id="embedFrame" width="600" height="400"></iframe>
     </div>
 
-    <div id="popup" style="display: none;">
-        <input type="text" id="embedInput" placeholder="Enter embed link" />
-        <button id="submitLink">Enter</button>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
-    <script src="script.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
 
     <script>
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyCXNoXZDzAaFKnX-BY7d_dS09fLxlIzAQ0",
-        authDomain: "poker-hq.firebaseapp.com",
-        projectId: "poker-hq",
-        storageBucket: "poker-hq.appspot.com",
-        messagingSenderId: "968470349230",
-        appId: "1:968470349230:web:15f3c021ce9a6bdd10b43f"
-      };
-    
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-    </script>
-</body>
+        // Firebase config (Replace with your Firebase config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXNoXZDzAaFKnX-BY7d_dS09fLxlIzAQ0",
+            authDomain: "poker-hq.firebaseapp.com",
+            projectId: "poker-hq",
+            storageBucket: "poker-hq.appspot.com",
+            messagingSenderId: "968470349230",
+            appId: "1:968470349230:web:15f3c021ce9a6bdd10b43f"
+        };
 
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM Elements
+        const secretButton = document.getElementById('secretButton');
+        const popup = document.getElementById('popup');
+        const passwordInputDiv = document.getElementById('passwordInputDiv');
+        const linkInputDiv = document.getElementById('linkInputDiv');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordSubmit = document.getElementById('passwordSubmit');
+        const embedInput = document.getElementById('embedInput');
+        const submitLink = document.getElementById('submitLink');
+        const errorMessage = document.getElementById('errorMessage');
+
+        const correctPassword = 'stupid'; // Password to unlock the link input
+
+        // Show popup when invisible button is clicked
+        secretButton.addEventListener('click', () => {
+            popup.style.display = 'block';
+        });
+
+        // Password validation logic
+        passwordSubmit.addEventListener('click', () => {
+            const enteredPassword = passwordInput.value;
+
+            if (enteredPassword === correctPassword) {
+                // Hide password input and show link input
+                passwordInputDiv.style.display = 'none';
+                linkInputDiv.style.display = 'block';
+                errorMessage.style.display = 'none'; // Hide error message
+            } else {
+                // Incorrect password, clear input and show error
+                passwordInput.value = '';
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        // Link submission logic
+        submitLink.addEventListener('click', () => {
+            const embedLink = embedInput.value;
+
+            if (embedLink) {
+                // Hide popup
+                popup.style.display = 'none';
+
+                // Save the embed link to Firebase Realtime Database
+                const ref = firebase.database().ref('embeds');
+
+                // Set all past nodes to display: false
+                ref.once('value', (snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        ref.child(childSnapshot.key).update({ display: false });
+                    });
+
+                    // Add new node with display: true
+                    ref.push({
+                        link: embedLink,
+                        display: true
+                    });
+                });
+
+                // Clear input fields
+                embedInput.value = '';
+                passwordInput.value = '';
+            }
+        });
+
+        // Optionally, check and display the active embed link on page load
+        function checkEmbedStatus() {
+            const ref = firebase.database().ref('embeds');
+            
+            ref.on('value', (snapshot) => {
+                let activeNode = null;
+                snapshot.forEach(childSnapshot => {
+                    const childData = childSnapshot.val();
+                    if (childData.display === true) {
+                        activeNode = childData;
+                    }
+                });
+
+                if (activeNode) {
+                    showEmbed(activeNode.link);
+                } else {
+                    showNoLobby();
+                }
+            });
+        }
+
+        // Show the embed iframe
+        function showEmbed(link) {
+            document.getElementById('embedFrame').src = link;
+        }
+
+        // Show message when no lobby is found
+        function showNoLobby() {
+            document.getElementById('embedFrame').src = '';
+        }
+
+        // Check embed status when the page loads
+        checkEmbedStatus();
+    </script>
+
+</body>
 </html>
