@@ -375,9 +375,7 @@
 
                     // Increment join count atomically using transaction
                     database.ref('embeds/' + activeLobby.key + '/joinCount').transaction((currentCount) => {
-                        const newCount = (currentCount || 0) + 1; // increment the join count
-                        playersJoined.textContent = newCount; // update the displayed join count immediately
-                        return newCount;
+                        return (currentCount || 0) + 1; // increment the join count by 1
                     });
 
                     // Decrement join count when the user leaves the page
@@ -387,6 +385,7 @@
                         });
                     });
                 });
+
 
                 // Detect if the current active lobby's display turns false
                 activeLobby.ref.on('child_changed', (changeSnapshot) => {
