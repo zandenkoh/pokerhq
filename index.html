@@ -105,7 +105,7 @@
             border: 2px solid #1da1f2;
             outline: none;
         }
-        
+
         .input-p {
             color: #000;
         }
@@ -349,6 +349,9 @@
         // Firebase listener for active lobby and player count
         database.ref('embeds').on('value', (snapshot) => {
             let activeLobby = null;
+            let newActiveLobby = null;
+
+            // Find the currently active lobby
             snapshot.forEach(childSnapshot => {
                 if (childSnapshot.val().display === true) {
                     activeLobby = childSnapshot;
@@ -357,11 +360,14 @@
 
             if (activeLobby) {
                 const lobbyData = activeLobby.val();
+
+                // Show the lobby and embed details
                 lobbyStatus.textContent = 'Lobby is open! | ';
                 playersJoined.textContent = lobbyData.joinCount;
                 joinBtn.disabled = false;
                 joinBtn.textContent = "Join Game";
 
+                // If a user clicks the "Join Game" button
                 joinBtn.addEventListener('click', () => {
                     document.querySelector('.card').style.display = 'none';
                     document.getElementById('embedContainer').style.display = 'block';
@@ -382,12 +388,57 @@
                     });
                 });
 
+                // Detect if the current active lobby's display turns false
+                activeLobby.ref.on('child_changed', (changeSnapshot) => {
+                    if (changeSnapshot.key === 'display' && changeSnapshot.val() === false) {
+                        // Hide the embed and show the card again
+                        document.getElementById('embedContainer').style.display = 'none';
+                        document.querySelector('.card').style.display = 'block';
+                        lobbyStatus.textContent = 'No active lobbies | ';
+                        playersJoined.textContent = '0';
+                        joinBtn.disabled = true;
+                        joinBtn.textContent = "No Game Available";
+                        document.getElementById('embedFrame').src = ''; // Remove the embed link
+                    }
+                });
             } else {
+                // No active lobbies
                 lobbyStatus.textContent = 'No active lobbies | ';
                 playersJoined.textContent = '0';
                 joinBtn.disabled = true;
                 joinBtn.textContent = "No Game Available";
+                document.getElementById('embedContainer').style.display = 'none';
+                document.querySelector('.card').style.display = 'block';
+                document.getElementById('embedFrame').src = ''; // Remove the embed link
             }
+
+            // Watch for new lobbies with display: true
+            snapshot.forEach(childSnapshot => {
+                if (childSnapshot.val().display === true && (!activeLobby || childSnapshot.key !== activeLobby.key)) {
+                    newActiveLobby = childSnapshot.val();
+                    document.querySelector('.card').style.display = 'none';
+                    document.getElementById('embedContainer').style.display = 'block';
+                    document.getElementById('embedFrame').src = newActiveLobby.link;
+                    lobbyStatus.textContent = 'Lobby is open! | ';
+                    playersJoined.textContent = newActiveLobby.joinCount;
+                    joinBtn.disabled = false;
+                    joinBtn.textContent = "Join Game";
+
+                    // Listen for changes in the new active lobby
+                    childSnapshot.ref.on('child_changed', (changeSnapshot) => {
+                        if (changeSnapshot.key === 'display' && changeSnapshot.val() === false) {
+                            // If the new active lobby's display turns false, hide the embed
+                            document.getElementById('embedContainer').style.display = 'none';
+                            document.querySelector('.card').style.display = 'block';
+                            lobbyStatus.textContent = 'No active lobbies | ';
+                            playersJoined.textContent = '0';
+                            joinBtn.disabled = true;
+                            joinBtn.textContent = "No Game Available";
+                            document.getElementById('embedFrame').src = '';
+                        }
+                    });
+                }
+            });
         });
     </script>
 </body>
