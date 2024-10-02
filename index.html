@@ -6,23 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://zandenkoh.codeberg.page/Radium/assets/Neutron-2.png">
     <title>Poker HQ</title>
+    <script src="https://kit.fontawesome.com/a47fae704c.js" crossorigin="anonymous"></script>
     <style>
-        /* Invisible button */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1c1c1e, #14171a);
+            color: #f7f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* Secret button */
 
         #secretButton {
-            position: absolute;
-            bottom: 0px;
-            left: 0px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 3px;
             height: 3px;
             background: transparent;
             border: none;
             cursor: default;
-            z-index: 100;
-            /* Keep it on top of everything */
+            z-index: 998;
         }
 
-        /* Popup Styling */
+        /* Popup styling */
 
         #popup {
             display: none;
@@ -30,104 +43,146 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 50px 100px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 998;
-            /* Above everything */
-        }
-
-        :root {
-            --twitter-blue: #1DA1F2;
-            /* Twitter brand colour */
-        }
-
-        #popup {
-            /* Existing styles remain, just add background color */
             background: #ffffff;
-            /* White background for the popup */
+            border: none;
+            padding: 40px;
             border-radius: 15px;
-            /* Rounded corners for the popup */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            width: 90%;
+            max-width: 400px;
         }
 
         button {
-            background-color: var(--twitter-blue);
-            /* Twitter button color */
+            background-color: #1da1f2;
             color: white;
-            /* Text colour */
             border: none;
-            /* No border */
-            border-radius: 100px;
-            /* Rounded corners */
-            width: 100%;
-            font-size: 15px;
+            border-radius: 50px;
+            font-size: 16px;
             font-weight: 600;
-            padding: 14px 20px;
-            /* Padding for better button size */
+            padding: 15px 30px;
+            width: 100%;
             cursor: pointer;
-            /* Pointer cursor on hover */
+            transition: all 0.3s ease;
+            margin-top: 20px;
         }
 
-        /* Add hover effect for buttons */
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        button:disabled:hover {
+            background-color: #aaa;
+            /* Keep the disabled background color */
+            cursor: not-allowed;
+            /* Optional: changes the cursor to indicate it's disabled */
+            transform: none;
+            /* No transform when hovered */
+            opacity: 1;
+            /* Ensures the opacity remains the same */
+        }
 
         button:hover {
-            /*background-color: #1A91DA;*/
-            opacity: 0.85;
+            background-color: #0d8ddb;
+            transform: translateY(-2px);
         }
 
-        /* Optional: Style the inputs for a consistent look */
+        /* Inputs styling */
 
         input[type="password"],
         input[type="text"] {
-            border: 1px solid #ccc;
-            /* Light grey border */
-            border-radius: 5px;
-            /* Slightly rounded corners */
-            padding: 14px 18px;
-            /* Padding for input fields */
-            width: calc(100% - 36px);
-            /* Full width minus padding */
+            border: 2px solid #f1f1f1;
+            border-radius: 10px;
+            padding: 15px 20px;
+            width: calc(100% - 40px);
             margin-bottom: 30px;
+            background-color: #f1f1f1;
+            font-size: 16px;
         }
 
-        input[type="password"]:focus,
-        input[type="text"]:focus {
-            border: 1px solid #aaa;
-            /* Light grey border */
+        input:focus {
+            border: 2px solid #1da1f2;
             outline: none;
         }
-
-        /* Optional: Style for error message */
-
-        #errorMessage {
-            color: red;
-            display: none;
-            margin-top: 10px;
-            /* Space above error message */
+        
+        .input-p {
+            color: #000;
         }
 
-        /* Hidden initially */
+        #errorMessage {
+            color: #d63031;
+            font-size: 14px;
+            display: none;
+        }
 
         #linkInputDiv {
             display: none;
         }
 
-        #errorMessage {
-            color: red;
-            display: none;
+        /* Main card container */
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            color: #f1f1f1;
         }
 
-        /* Full page embed */
+        .card h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1da1f2;
+        }
+
+        .card p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .card ul li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            color: #f7f9f9;
+        }
+
+        .card ul li::before {
+            content: '•';
+            color: #1da1f2;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .card .join-info {
+            font-size: 16px;
+            margin-top: 15px;
+            margin-bottom: 0;
+            color: #f7f9f9;
+        }
 
         #embedContainer {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            background: #fff;
+            z-index: 999;
         }
 
         #embedFrame {
@@ -136,70 +191,73 @@
             border: none;
         }
 
-        /* Full page container for no lobby found */
-
-        #noLobbyContainer {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #f7f7f7;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        #noLobbyContainer h1 {}
-
-        #noLobbyContainer p {
-            color: #555;
-            margin-top: 0px;
-            max-width: 700px;
-            padding-left: 40px;
-            padding-right: 40px;
-            font-size: 17px;
-        }
+        /* Overlay effect */
 
         #overlay {
             display: none;
-            /* Initially hidden */
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            /* Black with 50% opacity */
+            background-color: rgba(0, 0, 0, 0.7);
             z-index: 997;
-            /* Below the popup but above everything else */
+        }
+
+        /* Animation */
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <img src="https://community.adobe.com/t5/image/serverpage/image-id/659062i8E9357F0BEE82A47?v=v2" style="position: fixed; top: 0; left: 0; object-fit: cover; width: 100%; height: 100%; z-index: 999; display: none;" id="imageOverlay" />
-
-    <!-- Invisible Button -->
     <button id="secretButton"></button>
 
     <div id="overlay"></div>
 
-    <!-- Popup for Password and Link Input -->
+    <!-- Main Container -->
+    <div class="card">
+        <h1>Welcome to Poker HQ!</h1>
+        <p>Join a poker match in real-time, or wait for the next game. Here's what you can do:</p>
+        <ul>
+            <li>Instantly join ongoing poker lobbies.</li>
+            <li>See how many players have joined the match.</li>
+            <li>Automatic updates on lobby status.</li>
+            <li>Enjoy a seamless poker experience without page reloads.</li>
+        </ul>
+        <button id="joinBtn" disabled>Join Game</button>
+        <div class="join-info">
+            <span id="lobbyStatus">No active lobbies | </span>
+            <span><i class="fa-solid fa-user"></i> </span>
+            <span id="playersJoined">0</span>
+        </div>
+    </div>
+
+    <!-- Popup -->
     <div id="popup">
         <div id="passwordInputDiv">
-            <p>Enter Password:</p>
+            <p class="input-p">Enter Password:</p>
             <input type="password" id="passwordInput" placeholder="Password">
             <button id="passwordSubmit">Enter</button>
             <p id="errorMessage">Incorrect password. Please try again.</p>
         </div>
 
         <div id="linkInputDiv">
-            <p>Enter Embed Link:</p>
+            <p class="input-p">Enter Embed Link:</p>
             <input type="text" id="embedInput" placeholder="Embed Link">
             <button id="submitLink">Submit Link</button>
         </div>
@@ -210,20 +268,11 @@
         <iframe id="embedFrame"></iframe>
     </div>
 
-    <!-- No Lobby Found Container -->
-    <div id="noLobbyContainer">
-        <h1>Poker HQ</h1>
-        <p style="margin-top: 10px; margin-bottom: 10px">Currently, there are no active poker lobbies. Stay tuned for upcoming games!</p>
-        <p>However, with this system, you can enjoy instant updates on Poker lobby links without needing to reload the page. No more manual updates or waiting—just quick access to the latest Poker lobby!</p>
-        <p style="margin-top: 20px; font-weight: 600;">Notify an admin to start a Poker lobby:</p>
-        <button id="useless-btn" style="margin-top: -10px; width: 300px; padding: 12px; font-size: 14px; font-weight: 600; border-radius: 100px;">Notify Admin</button>
-    </div>
-
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
 
     <script>
-        // Firebase config (Replace with your Firebase config)
+        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyCXNoXZDzAaFKnX-BY7d_dS09fLxlIzAQ0",
             authDomain: "poker-hq.firebaseapp.com",
@@ -237,7 +286,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // DOM Elements
         const secretButton = document.getElementById('secretButton');
         const popup = document.getElementById('popup');
         const passwordInputDiv = document.getElementById('passwordInputDiv');
@@ -246,29 +294,13 @@
         const passwordSubmit = document.getElementById('passwordSubmit');
         const embedInput = document.getElementById('embedInput');
         const submitLink = document.getElementById('submitLink');
-        const errorMessage = document.getElementById('errorMessage');
+        const joinBtn = document.getElementById('joinBtn');
+        const lobbyStatus = document.getElementById('lobbyStatus');
+        const playersJoined = document.getElementById('playersJoined');
 
-        const correctPassword = 'stupid'; // Password to unlock the link input
+        let correctPassword = 'stupid'; // Password to unlock link input
 
-        // Title animation variables
-        let titleInterval;
-        const originalTitle = document.title;
-
-        const notifyAdminButton = document.getElementById('useless-btn');
-        const imageOverlay = document.getElementById('imageOverlay');
-
-        // Add click event listener to the button
-        notifyAdminButton.addEventListener('click', () => {
-            // Show the image overlay
-            imageOverlay.style.display = 'flex';
-
-            // Hide the overlay after 1 second
-            setTimeout(() => {
-                imageOverlay.style.display = 'none';
-            }, 2000); // 1000 milliseconds = 1 second
-        });
-
-        // Show popup when invisible button is clicked
+        // Secret button to open the popup
         secretButton.addEventListener('click', () => {
             popup.style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
@@ -276,136 +308,88 @@
 
         document.getElementById('overlay').addEventListener('click', () => {
             popup.style.display = 'none';
-            document.getElementById('overlay').style.display = 'none'; // Hide overlay
+            document.getElementById('overlay').style.display = 'none';
         });
 
-        // Password validation logic
+        // Password validation
         passwordSubmit.addEventListener('click', () => {
             const enteredPassword = passwordInput.value;
-
             if (enteredPassword === correctPassword) {
-                // Hide password input and show link input
                 passwordInputDiv.style.display = 'none';
                 linkInputDiv.style.display = 'block';
-                errorMessage.style.display = 'none'; // Hide error message
+                document.getElementById('errorMessage').style.display = 'none';
             } else {
-                // Incorrect password, clear input and show error
-                passwordInput.value = '';
-                errorMessage.style.display = 'block';
+                document.getElementById('errorMessage').style.display = 'block';
             }
         });
 
-        // Link submission logic
+        // Link submission
         submitLink.addEventListener('click', () => {
             const embedLink = embedInput.value;
-
             if (embedLink) {
-                // Hide popup
-                popup.style.display = 'none';
-
-                // Save the embed link to Firebase Realtime Database
                 const ref = firebase.database().ref('embeds');
-
-                // Set all past nodes to display: false
                 ref.once('value', (snapshot) => {
-                    snapshot.forEach((childSnapshot) => {
+                    snapshot.forEach(childSnapshot => {
                         ref.child(childSnapshot.key).update({
                             display: false
                         });
                     });
-
-                    // Add new node with display: true
                     ref.push({
                         link: embedLink,
-                        display: true
+                        display: true,
+                        joinCount: 0
+                    });
+                });
+                embedInput.value = '';
+                popup.style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+        });
+
+        // Firebase listener for active lobby and player count
+        database.ref('embeds').on('value', (snapshot) => {
+            let activeLobby = null;
+            snapshot.forEach(childSnapshot => {
+                if (childSnapshot.val().display === true) {
+                    activeLobby = childSnapshot;
+                }
+            });
+
+            if (activeLobby) {
+                const lobbyData = activeLobby.val();
+                lobbyStatus.textContent = 'Lobby is open! | ';
+                playersJoined.textContent = lobbyData.joinCount;
+                joinBtn.disabled = false;
+                joinBtn.textContent = "Join Game";
+
+                joinBtn.addEventListener('click', () => {
+                    document.querySelector('.card').style.display = 'none';
+                    document.getElementById('embedContainer').style.display = 'block';
+                    document.getElementById('embedFrame').src = lobbyData.link;
+
+                    // Increment join count atomically using transaction
+                    database.ref('embeds/' + activeLobby.key + '/joinCount').transaction((currentCount) => {
+                        const newCount = (currentCount || 0) + 1; // increment the join count
+                        playersJoined.textContent = newCount; // update the displayed join count immediately
+                        return newCount;
+                    });
+
+                    // Decrement join count when the user leaves the page
+                    window.addEventListener('beforeunload', () => {
+                        database.ref('embeds/' + activeLobby.key + '/joinCount').transaction((currentCount) => {
+                            return Math.max((currentCount || 0) - 1, 0); // decrement the join count
+                        });
                     });
                 });
 
-                // Clear input fields
-                embedInput.value = '';
-                passwordInput.value = '';
+            } else {
+                lobbyStatus.textContent = 'No active lobbies | ';
+                playersJoined.textContent = '0';
+                joinBtn.disabled = true;
+                joinBtn.textContent = "No Game Available";
             }
         });
-
-        // Optionally, check and display the active embed link on page load
-        function checkEmbedStatus() {
-            const ref = firebase.database().ref('embeds');
-
-            ref.on('value', (snapshot) => {
-                let activeNode = null;
-                snapshot.forEach(childSnapshot => {
-                    const childData = childSnapshot.val();
-                    if (childData.display === true) {
-                        activeNode = childData;
-                    }
-                });
-
-                if (activeNode) {
-                    showEmbed(activeNode.link);
-                    document.getElementById('overlay').style.display = 'none';
-                } else {
-                    showNoLobby();
-                    document.getElementById('overlay').style.display = 'none';
-                }
-            });
-        }
-
-        // Show the embed iframe
-        function showEmbed(link) {
-            document.getElementById('embedContainer').style.display = 'block';
-            document.getElementById('noLobbyContainer').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('embedFrame').src = link;
-        }
-
-        // Show message when no lobby is found
-        function showNoLobby() {
-            document.getElementById('embedContainer').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('noLobbyContainer').style.display = 'flex'; // Make sure the container is visible
-        }
-
-        // Notify user when the game has started
-        function notifyGameStarted() {
-            // Change the title and start animation
-            document.title = "The game has started!";
-            startTitleAnimation();
-        }
-
-        // Start the title animation
-        function startTitleAnimation() {
-            if (titleInterval) clearInterval(titleInterval); // Clear any existing interval
-            let titleText = document.title;
-            let index = 0;
-
-            titleInterval = setInterval(() => {
-                if (index < titleText.length) {
-                    document.title = titleText.slice(index);
-                    index++;
-                } else {
-                    clearInterval(titleInterval);
-                    // Reset after full animation
-                    setTimeout(() => {
-                        document.title = "The game has started!";
-                        startTitleAnimation();
-                    }, 1000); // Delay before restarting the animation
-                }
-            }, 200); // Change title every 200 ms
-        }
-
-        // Reset title on page visibility change
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                document.title = originalTitle; // Reset to original title
-                if (titleInterval) clearInterval(titleInterval); // Clear title animation interval
-            }
-        });
-
-
-        // Check embed status when the page loads
-        checkEmbedStatus();
     </script>
-
 </body>
 
 </html>
