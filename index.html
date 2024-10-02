@@ -27,12 +27,159 @@
             position: fixed;
             bottom: 0;
             left: 0;
-            width: 3px;
-            height: 3px;
+            width: 30px;
+            height: 30px;
             background: transparent;
             border: none;
             cursor: default;
-            z-index: 998;
+            z-index: 997;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        #secretButton:hover {
+            transform: translateY(0px);
+        }
+
+        #jumpScareBtn {
+            position: fixed;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: #fff;
+            border: none;
+            cursor: pointer;
+            z-index: 997;
+            border-radius: 8px;
+            padding: 0;
+            color: #000;
+            margin-top: 0;
+            font-size: 13px;
+            display: none;
+        }
+
+        #jumpScareBtn:hover {
+            transform: translateY(0px);
+            transform: translateX(-50%);
+            opacity: 0.9;
+        }
+
+        /* Jumpscare Popup Styling */
+
+        #jumpScarePopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            border: none;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        #jumpScarePopup h2 {
+            font-size: 28px;
+            color: #1da1f2;
+            margin-bottom: 20px;
+        }
+
+        #jumpScarePopup p {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #a1a1a1;
+        }
+
+        #jumpscarePopup input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 2px solid #f1f1f1;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        #submitScare {
+            background-color: #1da1f2;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 15px 30px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            margin-left: 0px;
+        }
+
+        #submitScare:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #submitScare:hover:enabled {
+            background-color: #0d8ddb;
+        }
+        
+        .popup-content {
+            background-color: white;
+            padding: 0;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            margin: auto;
+        }
+
+        .popup-content h2 {
+            color: #1da1f2;
+            margin-bottom: 20px;
+        }
+
+        .popup-content button {
+            background-color: #1da1f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .popup-content button:hover {
+            background-color: #0d8ddb;
+        }
+
+        /* Jumpscare Image Styling */
+
+        #jumpscareImage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #jumpscareImage img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
         }
 
         /* Popup styling */
@@ -55,7 +202,7 @@
 
         button {
             background-color: #1da1f2;
-            color: white;
+            color: #fff;
             border: none;
             border-radius: 50px;
             font-size: 16px;
@@ -69,6 +216,7 @@
 
         button:disabled {
             background-color: #aaa;
+            color: #fff;
             cursor: not-allowed;
         }
 
@@ -182,7 +330,7 @@
             width: 100%;
             height: 100%;
             background: #1c7243;
-            z-index: 999;
+            z-index: 996;
         }
 
         #embedFrame {
@@ -201,7 +349,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            z-index: 997;
+            z-index: 998;
         }
 
         /* Animation */
@@ -225,22 +373,33 @@
             animation: fadeOut 1s ease-in-out forwards;
         }
 
+        .no-animation {
+            /* No shrinking or animation when the display is shown without user interaction */
+            animation: none;
+            transform: none;
+            opacity: 1;
+        }
+
         @keyframes fadeOut {
             0% {
                 opacity: 1;
                 transform: scale(1);
             }
             100% {
-                opacity: 0.2;
-                transform: scale(0.3);
+                opacity: 0;
+                transform: scale(0.1);
             }
         }
+
     </style>
 </head>
 
 <body>
 
     <button id="secretButton"></button>
+
+    <!-- Jump Scare Button (Initially Hidden) -->
+    <button id="jumpScareBtn">Create a Jump Scare</button>
 
     <div id="overlay"></div>
 
@@ -254,7 +413,7 @@
             <li>Automatic updates on lobby status.</li>
             <li>Enjoy a seamless poker experience without page reloads.</li>
         </ul>
-        <button id="joinBtn" disabled>Join Game</button>
+        <button id="joinBtn" disabled>Join Lobby</button>
         <div class="join-info">
             <span id="lobbyStatus">No active lobbies | </span>
             <span><i class="fa-solid fa-user"></i> </span>
@@ -275,6 +434,18 @@
             <p class="input-p">Enter Embed Link:</p>
             <input type="text" id="embedInput" placeholder="Embed Link">
             <button id="submitLink">Submit Link</button>
+        </div>
+    </div>
+    
+        <!-- Jump Scare Popup -->
+    <div id="jumpScarePopup">
+        <div class="popup-content">
+            <h2>Prepare the Scare!</h2>
+            <p></p>
+            <p>To create a jump scare, paste a link to the photo you want to use in the box below. A randomised timer will set off the scare once you submit it.</p>
+            <input type="text" id="scareImageInput" placeholder="Image Link" />
+            <button id="submitScare" style="border-radius: 100px; padding: 15px;">Submit Scare</button>
+            <p id="submitCooldown" style="display: none; color: red;">You can submit again in 10 minutes!</p>
         </div>
     </div>
 
@@ -324,6 +495,7 @@
         document.getElementById('overlay').addEventListener('click', () => {
             popup.style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
+            jumpScarePopup.style.display = 'none';
         });
 
         // Password validation
@@ -377,15 +549,16 @@
                 const lobbyData = activeLobby.val();
 
                 // Show the lobby and embed details
-                lobbyStatus.textContent = 'Lobby is open! | ';
+                lobbyStatus.textContent = 'Lobby is active | ';
                 playersJoined.textContent = lobbyData.joinCount;
                 joinBtn.disabled = false;
-                joinBtn.textContent = "Join Game";
+                joinBtn.textContent = "Join Lobby";
 
                 function joinGame(lobbyData) {
                     const card = document.querySelector('.card');
 
-                    // Add the fade-out class
+                    // Add the fade-out class when the user joins
+                    card.classList.remove('no-animation'); // Ensure no-animation class is removed if it was added before
                     card.classList.add('fade-out');
 
                     // Wait for the fade-out animation to complete
@@ -401,10 +574,10 @@
                     }, 1000); // Match the duration to the CSS animation duration
                 }
 
-
                 // Add event listener for join button only once
                 joinBtn.addEventListener('click', () => {
                     joinGame(lobbyData);
+                    jumpScareBtn.style.display = 'block';
                 });
 
                 // Decrement join count when the user leaves the page
@@ -414,14 +587,16 @@
                     });
                 });
 
-
-
                 // Detect if the current active lobby's display turns false
                 activeLobby.ref.on('child_changed', (changeSnapshot) => {
                     if (changeSnapshot.key === 'display' && changeSnapshot.val() === false) {
-                        // Hide the embed and show the card again
+                        // Hide the embed and show the card again, without shrink animation
                         document.getElementById('embedContainer').style.display = 'none';
-                        document.querySelector('.card').style.display = 'block';
+                        const card = document.querySelector('.card');
+
+                        // Immediately show the container without shrinking it
+                        card.classList.add('no-animation');
+                        card.style.display = 'block';
                         lobbyStatus.textContent = 'No active lobbies | ';
                         playersJoined.textContent = '0';
                         joinBtn.disabled = true;
@@ -436,7 +611,9 @@
                 joinBtn.disabled = true;
                 joinBtn.textContent = "No Game Available";
                 document.getElementById('embedContainer').style.display = 'none';
-                document.querySelector('.card').style.display = 'block';
+                const card = document.querySelector('.card');
+                card.classList.add('no-animation'); // Ensure it's shown without animation
+                card.style.display = 'block';
                 document.getElementById('embedFrame').src = ''; // Remove the embed link
             }
 
@@ -447,17 +624,19 @@
                     document.querySelector('.card').style.display = 'none';
                     document.getElementById('embedContainer').style.display = 'block';
                     document.getElementById('embedFrame').src = newActiveLobby.link;
-                    lobbyStatus.textContent = 'Lobby is open! | ';
+                    lobbyStatus.textContent = 'Lobby is active | ';
                     playersJoined.textContent = newActiveLobby.joinCount;
                     joinBtn.disabled = false;
-                    joinBtn.textContent = "Join Game";
+                    joinBtn.textContent = "Join Lobby";
 
                     // Listen for changes in the new active lobby
                     childSnapshot.ref.on('child_changed', (changeSnapshot) => {
                         if (changeSnapshot.key === 'display' && changeSnapshot.val() === false) {
-                            // If the new active lobby's display turns false, hide the embed
+                            // If the new active lobby's display turns false, hide the embed without animation
                             document.getElementById('embedContainer').style.display = 'none';
-                            document.querySelector('.card').style.display = 'block';
+                            const card = document.querySelector('.card');
+                            card.classList.add('no-animation');
+                            card.style.display = 'block';
                             lobbyStatus.textContent = 'No active lobbies | ';
                             playersJoined.textContent = '0';
                             joinBtn.disabled = true;
@@ -465,6 +644,99 @@
                             document.getElementById('embedFrame').src = '';
                         }
                     });
+                }
+            });
+        });
+
+        const jumpScareBtn = document.getElementById('jumpScareBtn');
+        const jumpScarePopup = document.getElementById('jumpScarePopup');
+        const submitScare = document.getElementById('submitScare');
+        const scareImageInput = document.getElementById('scareImageInput');
+        const submitCooldown = document.getElementById('submitCooldown');
+        let isCooldown = false;
+        let scareTimeouts = [10000, 50000, 120000, 300000]; // 10s, 50s, 2m, 5m
+
+        // Show Jump Scare Button if user has joined the lobby
+        database.ref('embeds').on('value', (snapshot) => {
+            let activeLobby = null;
+
+            snapshot.forEach(childSnapshot => {
+                if (childSnapshot.val().display === true) {
+                    activeLobby = childSnapshot.val();
+                }
+            });
+
+            if (activeLobby) {
+                joinBtn.addEventListener('click', () => {
+                    // After joining, show the jump scare button
+                    jumpScareBtn.style.display = 'block';
+                });
+            }
+        });
+
+        // Jump Scare Button event listener
+        jumpScareBtn.addEventListener('click', () => {
+            jumpScarePopup.style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            
+        });
+
+        // Submit Scare Button event listener
+        submitScare.addEventListener('click', () => {
+            if (isCooldown) return; // Prevent submission if cooldown is active
+            const imageLink = scareImageInput.value;
+            if (!imageLink) return;
+
+            // Pick a random timeout for the scare to appear
+            const randomTimeout = scareTimeouts[Math.floor(Math.random() * scareTimeouts.length)];
+            const timestamp = Date.now() + randomTimeout;
+
+            // Save scare info to the database
+            const scareRef = firebase.database().ref('scares').push();
+            scareRef.set({
+                imageLink: imageLink,
+                timestamp: timestamp,
+                used: false
+            });
+
+            // Start cooldown (10 minutes)
+            isCooldown = true;
+            scareImageInput.disabled = true;
+            submitScare.disabled = true;
+            submitScare.textContent = "Scare Submitted"
+            submitCooldown.style.display = 'block';
+
+            setTimeout(() => {
+                isCooldown = false;
+                scareImageInput.disabled = false;
+                submitScare.disabled = false;
+                submitCooldown.style.display = 'none';
+            }, 600000); // 10 minutes cooldown
+        });
+
+        // Listen for scares and display them at the right time
+        firebase.database().ref('scares').on('value', (snapshot) => {
+            snapshot.forEach(childSnapshot => {
+                const scare = childSnapshot.val();
+                const scareKey = childSnapshot.key;
+                const currentTime = Date.now();
+
+                if (scare.used === false && currentTime >= scare.timestamp) {
+                    // Display the scare
+                    const scareImage = new Image();
+                    scareImage.src = scare.imageLink;
+                    scareImage.style = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;';
+                    document.body.appendChild(scareImage);
+
+                    setTimeout(() => {
+                        // Remove the scare after 2 seconds
+                        document.body.removeChild(scareImage);
+
+                        // Mark the scare as used
+                        firebase.database().ref('scares/' + scareKey).update({
+                            used: true
+                        });
+                    }, 2000); // Show for 2 seconds
                 }
             });
         });
