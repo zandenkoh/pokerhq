@@ -710,11 +710,11 @@
 
             const imageLink = scareImageInput.value;
 
-            // Regex to check if the URL ends with a common image file extension
-            const validImagePattern = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i;
+            // Simple check to ensure the URL starts with 'https://'
+            const validImagePattern = /^https:\/\/.*/i;
 
             if (!imageLink || !validImagePattern.test(imageLink)) {
-                alert('Please submit a valid image URL');
+                alert('Please submit a valid image URL (must start with https://)');
                 return;
             }
 
@@ -739,6 +739,7 @@
                 submitCooldown.style.display = 'none';
             }, 600000); // 10 minutes cooldown
         });
+
 
 
         // Firebase listener for new scares (triggers immediately)
