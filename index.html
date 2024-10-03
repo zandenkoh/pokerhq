@@ -447,10 +447,10 @@
         <div class="popup-content">
             <h2>Prepare the Scare!</h2>
             <p></p>
-            <p>To create a jump scare, paste a link to the photo you want to use in the box below. Once submitted, everyone in the lobby will receive it.</p>
-            <input type="text" id="scareImageInput" placeholder="Image Link" />
+            <p>To create a Jump Scare, paste a link to the photo you want to use in the box below. Once submitted, everyone in the lobby will receive it.</p>
+            <input type="text" id="scareImageInput" placeholder="Paste Image Link" />
             <button id="submitScare" style="border-radius: 100px; padding: 15px;">Submit Scare</button>
-            <p id="submitCooldown" style="display: none; color: #a1a1a1; font-size: 13px;">You can submit again in 10 minutes</p>
+            <p id="submitCooldown" style="display: none; color: #a1a1a1; font-size: 13px;">You can submit again in 3 minutes</p>
         </div>
     </div>
 
@@ -714,7 +714,7 @@
             const validImagePattern = /^https:\/\/.*/i;
 
             if (!imageLink || !validImagePattern.test(imageLink)) {
-                alert('Please submit a valid image URL (must start with https://)');
+                alert('Please submit a valid image address. Once you submit an image, it will be displayed on all screens. You are only allowed to submit an image every 3 minutes.');
                 return;
             }
 
@@ -737,7 +737,8 @@
                 scareImageInput.disabled = false;
                 submitScare.disabled = false;
                 submitCooldown.style.display = 'none';
-            }, 600000); // 10 minutes cooldown
+                submitScare.textContent = "Submit Scare";
+            }, 180000); // 10 minutes cooldown
         });
 
 
