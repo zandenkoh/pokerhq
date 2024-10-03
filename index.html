@@ -21,6 +21,11 @@
             user-select: none;
         }
 
+        .body-fade {
+            transition: background ease 0s;
+            background: #1c7243;
+        }
+
         /* Secret button */
 
         #secretButton {
@@ -91,7 +96,7 @@
         }
 
         #jumpScarePopup p {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             margin-bottom: 15px;
             color: #a1a1a1;
@@ -100,14 +105,14 @@
         #jumpscarePopup input[type="text"] {
             width: calc(100% - 40px);
             padding: 10px 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border-radius: 10px;
             border: 2px solid #f1f1f1;
             background-color: #333;
             color: #fff;
             font-size: 16px;
         }
-        
+
         #submitScare {
             background-color: #1da1f2;
             color: #fff;
@@ -119,7 +124,7 @@
             width: 100%;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
+            margin-top: 10px;
             margin-left: 0px;
         }
 
@@ -131,7 +136,7 @@
         #submitScare:hover:enabled {
             background-color: #0d8ddb;
         }
-        
+
         .popup-content {
             background-color: white;
             padding: 0;
@@ -271,7 +276,8 @@
         /* Main card container */
 
         .card {
-            background-color: rgba(255, 255, 255, 0.1);
+            /*background-color: rgba(255, 255, 255, 0.1);*/
+            background-color: #2f3034;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             max-width: 500px;
@@ -283,10 +289,10 @@
         }
 
         .card h1 {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 30px;
+            font-weight: 900;
             margin-bottom: 20px;
-            color: #1da1f2;
+            color: #1da1f3;
         }
 
         .card p {
@@ -390,7 +396,6 @@
                 transform: scale(0.1);
             }
         }
-
     </style>
 </head>
 
@@ -436,16 +441,16 @@
             <button id="submitLink">Submit Link</button>
         </div>
     </div>
-    
-        <!-- Jump Scare Popup -->
+
+    <!-- Jump Scare Popup -->
     <div id="jumpScarePopup">
         <div class="popup-content">
             <h2>Prepare the Scare!</h2>
             <p></p>
-            <p>To create a jump scare, paste a link to the photo you want to use in the box below. A randomised timer will set off the scare once you submit it.</p>
+            <p>To create a jump scare, paste a link to the photo you want to use in the box below. Once submitted, everyone in the lobby will receive it.</p>
             <input type="text" id="scareImageInput" placeholder="Image Link" />
             <button id="submitScare" style="border-radius: 100px; padding: 15px;">Submit Scare</button>
-            <p id="submitCooldown" style="display: none; color: red;">You can submit again in 10 minutes!</p>
+            <p id="submitCooldown" style="display: none; color: #a1a1a1; font-size: 13px;">You can submit again in 10 minutes</p>
         </div>
     </div>
 
@@ -555,13 +560,22 @@
                 joinBtn.textContent = "Join Lobby";
 
                 function joinGame(lobbyData) {
+                    // Check if the user has already joined from another tab
+                    if (localStorage.getItem('joinedLobby')) {
+                        alert('You are already in the lobby from another tab!');
+                        return;
+                    }
+
+                    // Set a flag in localStorage to mark that the user has joined
+                    localStorage.setItem('joinedLobby', 'true');
+
                     const card = document.querySelector('.card');
 
                     // Add the fade-out class when the user joins
-                    card.classList.remove('no-animation'); // Ensure no-animation class is removed if it was added before
+                    card.classList.remove('no-animation');
                     card.classList.add('fade-out');
+                    document.body.classList.add('body-fade');
 
-                    // Wait for the fade-out animation to complete
                     setTimeout(() => {
                         card.style.display = 'none';
                         document.getElementById('embedContainer').style.display = 'block';
@@ -574,6 +588,9 @@
                     }, 1000); // Match the duration to the CSS animation duration
                 }
 
+
+
+
                 // Add event listener for join button only once
                 joinBtn.addEventListener('click', () => {
                     joinGame(lobbyData);
@@ -582,10 +599,17 @@
 
                 // Decrement join count when the user leaves the page
                 window.addEventListener('beforeunload', () => {
+                    // Remove the session flag when the user leaves the page
+                    localStorage.removeItem('joinedLobby');
+
+                    // Decrement join count
                     database.ref('embeds/' + activeLobby.key + '/joinCount').transaction((currentCount) => {
                         return Math.max((currentCount || 0) - 1, 0); // decrement the join count
                     });
                 });
+
+
+
 
                 // Detect if the current active lobby's display turns false
                 activeLobby.ref.on('child_changed', (changeSnapshot) => {
@@ -678,24 +702,26 @@
         jumpScareBtn.addEventListener('click', () => {
             jumpScarePopup.style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
-            
+
         });
 
-        // Submit Scare Button event listener
         submitScare.addEventListener('click', () => {
             if (isCooldown) return; // Prevent submission if cooldown is active
+
             const imageLink = scareImageInput.value;
-            if (!imageLink) return;
 
-            // Pick a random timeout for the scare to appear
-            const randomTimeout = scareTimeouts[Math.floor(Math.random() * scareTimeouts.length)];
-            const timestamp = Date.now() + randomTimeout;
+            // Regex to check if the URL ends with a common image file extension
+            const validImagePattern = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i;
 
-            // Save scare info to the database
+            if (!imageLink || !validImagePattern.test(imageLink)) {
+                alert('Please submit a valid image URL');
+                return;
+            }
+
+            // Save scare info to the database immediately if valid
             const scareRef = firebase.database().ref('scares').push();
             scareRef.set({
                 imageLink: imageLink,
-                timestamp: timestamp,
                 used: false
             });
 
@@ -703,7 +729,7 @@
             isCooldown = true;
             scareImageInput.disabled = true;
             submitScare.disabled = true;
-            submitScare.textContent = "Scare Submitted"
+            submitScare.textContent = "Scare Submitted";
             submitCooldown.style.display = 'block';
 
             setTimeout(() => {
@@ -714,32 +740,36 @@
             }, 600000); // 10 minutes cooldown
         });
 
-        // Listen for scares and display them at the right time
-        firebase.database().ref('scares').on('value', (snapshot) => {
-            snapshot.forEach(childSnapshot => {
-                const scare = childSnapshot.val();
-                const scareKey = childSnapshot.key;
-                const currentTime = Date.now();
 
-                if (scare.used === false && currentTime >= scare.timestamp) {
-                    // Display the scare
-                    const scareImage = new Image();
-                    scareImage.src = scare.imageLink;
-                    scareImage.style = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;';
-                    document.body.appendChild(scareImage);
+        // Firebase listener for new scares (triggers immediately)
+        firebase.database().ref('scares').on('child_added', (childSnapshot) => {
+            const scare = childSnapshot.val();
+            const scareKey = childSnapshot.key;
 
-                    setTimeout(() => {
-                        // Remove the scare after 2 seconds
-                        document.body.removeChild(scareImage);
-
-                        // Mark the scare as used
-                        firebase.database().ref('scares/' + scareKey).update({
-                            used: true
-                        });
-                    }, 2000); // Show for 2 seconds
-                }
-            });
+            // If the scare hasn't been used yet, trigger it immediately
+            if (scare.used === false) {
+                triggerScare(scare.imageLink, scareKey);
+            }
         });
+
+        // Function to trigger the scare (display the image)
+        function triggerScare(imageLink, scareKey) {
+            // Display the scare image full screen
+            const scareImage = new Image();
+            scareImage.src = imageLink;
+            scareImage.style = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;';
+            document.body.appendChild(scareImage);
+
+            setTimeout(() => {
+                // Remove the scare after 2 seconds
+                document.body.removeChild(scareImage);
+
+                // Mark the scare as used
+                firebase.database().ref('scares/' + scareKey).update({
+                    used: true
+                });
+            }, 2000); // Show the scare image for 2 seconds
+        }
     </script>
 </body>
 
