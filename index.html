@@ -450,7 +450,7 @@
             <p>To create a Jump Scare, paste a link to the photo you want to use in the box below. Once submitted, everyone in the lobby will receive it.</p>
             <input type="text" id="scareImageInput" placeholder="Paste Image Link" />
             <button id="submitScare" style="border-radius: 100px; padding: 15px;">Submit Scare</button>
-            <p id="submitCooldown" style="display: none; color: #a1a1a1; font-size: 13px;">You can submit again in 3 minutes</p>
+            <p id="submitCooldown" style="display: none; color: #a1a1a1; font-size: 13px;">You can submit again in 1 minute</p>
         </div>
     </div>
 
@@ -714,7 +714,7 @@
             const validImagePattern = /^https:\/\/.*/i;
 
             if (!imageLink || !validImagePattern.test(imageLink)) {
-                alert('Please submit a valid image address. Once you submit an image, it will be displayed on all screens. You are only allowed to submit an image every 3 minutes.');
+                alert('Please submit a valid image address. Once you submit an image, it will be displayed on all screens. You are only allowed to submit an image every minute.');
                 return;
             }
 
@@ -738,7 +738,7 @@
                 submitScare.disabled = false;
                 submitCooldown.style.display = 'none';
                 submitScare.textContent = "Submit Scare";
-            }, 180000); // 10 minutes cooldown
+            }, 60000);
         });
 
 
@@ -770,7 +770,7 @@
                 firebase.database().ref('scares/' + scareKey).update({
                     used: true
                 });
-            }, 1000); // Show the scare image for 2 seconds
+            }, 1300); // Show the scare image for 2 seconds
         }
     </script>
 </body>
